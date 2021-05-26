@@ -3,6 +3,7 @@ import getpass
 from utils import ReleasedIn
 from utils import NumberOfIssuesPerReleaseIn
 from utils import MedianResolutionTimeIn
+from utils import IssueTypeDistribution
 from jira import JIRA
 
 if len(sys.argv) < 5: # 1st arg is the metrics.py
@@ -58,5 +59,13 @@ if not exactMatch:
 else:
     medianResolutionTime = MedianResolutionTimeIn(released[0], jira)
     print("Median resolution time " + str(released[0]) + ": " + medianResolutionTime)
+
+issueType = IssueTypeDistribution(released, jira)
+print("Issue Type Distribution:")
+print("    Bugs: " + str(issueType[0]) + "%")
+print("    Epic: " + str(issueType[1]) + "%")
+print("    Feature: " + str(issueType[2]) + "%")
+print("    Task: " + str(issueType[3]) + "%")
+print("    Sub-Task: " + str(issueType[4]) + "%")
 
 sys.exit(0)

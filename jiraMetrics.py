@@ -39,33 +39,32 @@ released = ReleasedIn(project, version, exactMatch, jira)
 if not exactMatch:
     print("Number of Versions: " + str(len(released)))
 
+totalIssues = 0
 issuesPerRelease = NumberOfIssuesPerReleaseIn(released, jira)
 if not exactMatch:
     print("Number of Issues per Version:")
-    i=0
-    while i != len(released):
-        print("    " + str(released[i]) + ": " + str(issuesPerRelease[i]))
-        i+=1
+    for idx, issues in enumerate(issuesPerRelease):
+        totalIssues += issues
+        print("    " + str(released[idx]) + ": " + str(issues))
 else:
+    totalIssues += issuesPerRelease[0]
     print("Number of Issues " + str(released[0]) + ": " + str(issuesPerRelease[0]))
 
 if not exactMatch:
     print("Median resolution time per Version:")
-    i=0
-    while i != len(released):
-        medianResolutionTimePerPatch = MedianResolutionTimeIn(released[i], jira)
-        print("    " + str(released[i]) + ": " + medianResolutionTimePerPatch)
-        i+=1
+    for release in released:
+        medianResolutionTimePerPatch = MedianResolutionTimeIn(release, jira)
+        print("    " + str(release) + ": " + medianResolutionTimePerPatch)
 else:
     medianResolutionTime = MedianResolutionTimeIn(released[0], jira)
     print("Median resolution time " + str(released[0]) + ": " + medianResolutionTime)
 
 issueType = IssueTypeDistribution(released, jira)
 print("Issue Type Distribution:")
-print("    Bugs: " + str(issueType[0]) + "%")
-print("    Epic: " + str(issueType[1]) + "%")
-print("    Feature: " + str(issueType[2]) + "%")
-print("    Task: " + str(issueType[3]) + "%")
-print("    Sub-Task: " + str(issueType[4]) + "%")
+print("    Bugs: " + "{:.2f}".format(100 * issueType[0]/totalIssues) + "%")
+print("    Epic: " + "{:.2f}".format(100 * issueType[1]/totalIssues) + "%")
+print("    Feature: " + "{:.2f}".format(100 * issueType[2]/totalIssues) + "%")
+print("    Task: " + "{:.2f}".format(100 * issueType[3]/totalIssues) + "%")
+print("    Sub-Task: " + "{:.2f}".format(100 * issueType[4]/totalIssues) + "%")
 
 sys.exit(0)

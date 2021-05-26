@@ -57,29 +57,43 @@ def MedianResolutionTimeIn(version, jira):
     minutes = (hours - int(hours)) * 60
     return str(int(days)) + 'd ' + str(int(hours)) + 'h ' + str(int(minutes)) + 'm'
 
-def IssueTypeDistribution(versions, jira):
-    typeValues = [0,0,0,0,0]
-
-    #for value in typeValues:
-        #value = AccumulateIssueType(i, versions, jira)
-
-    return typeValues
-
 class Type(enum.Enum):
     Bug = 0
     Epic = 1
     Feature = 2
-    Taks = 3
+    Task = 3
     SubTask = 4
 
-def AccumulateIssueType(type: Type, versions, jira):
-    i = 0
-    while i != len(versions):
-        query = "fixVersion=" + "'" + str(versions[i]) + "'"
-        issues = jira.search_issues(query, maxResults=1000)
-        
-        i += 1
+    @classmethod
+    def to_string(cls, type):
+        if type == Type.Bug:
+            return "Bug"
+        if type == Type.Epic:
+            return "Epic"
+        if type == Type.Feature:
+            return "New Feature"
+        if type == Type.Task:
+            return "Task"
+        if type == Type.SubTask:
+            return "Sub-task"
 
-    return 1
+
+def IssueTypeDistribution(versions, jira):
+    typeValues = []
+
+    for type in Type:
+        typeValues.append(AccumulateIssueType(type, versions, jira))
+
+    return typeValues
+
+def AccumulateIssueType(type: Type, versions, jira):
+    typeResult = 0
+    for version in versions:
+        query = "fixVersion=" + "'" + str(version) + "' AND " + "issuetype=" + "'" + Type.to_string(type) + "'"
+        issues = jira.search_issues(query, maxResults=1000)
+        for issue in issues:
+            typeResult += 1
+
+    return typeResult
 
 

@@ -1,25 +1,46 @@
+import sys
 import getpass
 from utils import ReleasedIn
 from utils import NumberOfIssuesPerReleaseIn
 from utils import MedianResolutionTimeIn
 from jira import JIRA
 
-user = input("Username:")
-passwd = getpass.getpass("Password for " + user + ":")
+if len(sys.argv) < 5: # 1st arg is the metrics.py
+    print("Arguments missing or in the wrong order:")
+    print("    - Jira URL, e.g. https://myJiraServer.com")
+    print("    - Jira Project short name, e.g. EXP")
+    print("    - fixVersion, e.g. ReleaseV0.1")
+    print("    - Match version string exact, e.g. 0 = false, 1 = True")
+    print("    Jira Credentials, Optional:")
+    print("        - Jira Username")
+    print("        - Jira Password")
+    sys.exit(1)
 
-jira = JIRA(server="http://arashi:8080/jira", basic_auth=(user, passwd), validate=True)
+if len(sys.argv) > 5:
+    user = sys.argv[5]
+else:
+    user = input("Jira username:")
 
-project = "KIS"
-version = "2020"
-isPatch = True
+if len(sys.argv) > 6:
+    passwd = sys.argv[6]
+else:
+    passwd = getpass.getpass("Jira password for " + user + ":")
 
-released = ReleasedIn(project, version, isPatch, jira)
-if isPatch:
-    print("Number of Patches: " + str(len(released)))
+jira = JIRA(server=sys.argv[1], basic_auth=(user, passwd), validate=True)
+
+project = sys.argv[2]
+version = sys.argv[3]
+exactMatch = False
+if sys.argv[4].lower() in ['true', '1']:
+    exactMatch = True
+
+released = ReleasedIn(project, version, exactMatch, jira)
+if not exactMatch:
+    print("Number of Versions: " + str(len(released)))
 
 issuesPerRelease = NumberOfIssuesPerReleaseIn(released, jira)
-if isPatch:
-    print("Number of Issues per Patch:")
+if not exactMatch:
+    print("Number of Issues per Version:")
     i=0
     while i != len(released):
         print("    " + str(released[i]) + ": " + str(issuesPerRelease[i]))
@@ -27,8 +48,8 @@ if isPatch:
 else:
     print("Number of Issues " + str(released[0]) + ": " + str(issuesPerRelease[0]))
 
-if isPatch:
-    print("Median resolution time per Patch:")
+if not exactMatch:
+    print("Median resolution time per Version:")
     i=0
     while i != len(released):
         medianResolutionTimePerPatch = MedianResolutionTimeIn(released[i], jira)
@@ -37,3 +58,5 @@ if isPatch:
 else:
     medianResolutionTime = MedianResolutionTimeIn(released[0], jira)
     print("Median resolution time " + str(released[0]) + ": " + medianResolutionTime)
+
+sys.exit(0)

@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\bmahr\\anaconda3\\python.exe"
+    "python.pythonPath": "C:\\Users\\bmahr\\anaconda3\\python.exe",
+    "python.condaPath": "C:\\Users\\bmahr\\anaconda3\\_conda.exe"
 }

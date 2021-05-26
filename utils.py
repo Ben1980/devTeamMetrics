@@ -4,23 +4,22 @@ from jira.resources import Issue
 from datetime import datetime
 from datetime import timedelta
 
-def GetVersion(project, version, isPatch, jira):
-    if isPatch:
+def GetVersion(project, version, exactMatch, jira):
+    if not exactMatch:
         versions = jira.project_versions(project)
         allVersions = []
         i = 0
         while i != len(versions):
-            if version + " P" in str(versions[i]) and versions[i].released:
+            if version in str(versions[i]) and versions[i].released:
                 allVersions.append(versions[i])
             i += 1
         return allVersions
 
     return [jira.get_project_version_by_name(project, version)]
 
-def ReleasedIn(project, version, isPatch, jira):
-    projectVersions = GetVersion(project, version, isPatch, jira)
+def ReleasedIn(project, version, exactMatch, jira):
+    projectVersions = GetVersion(project, version, exactMatch, jira)
     versions = []
-
     i = 0
     while i != len(projectVersions):
         if projectVersions[i].released:

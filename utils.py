@@ -53,7 +53,8 @@ def MedianResolutionTimeIn(patch, jira):
             createdTime = datetime.strptime(issue.fields.created.split(".")[0], '%Y-%m-%dT%H:%M:%S')
             resolvedTime = datetime.strptime(issue.fields.resolutiondate.split(".")[0], '%Y-%m-%dT%H:%M:%S')
             td_mins = int(round(abs((resolvedTime - createdTime).total_seconds()) / 60))
-            minutes.append(td_mins)
+            if td_mins > 0:
+                minutes.append(td_mins)
         i += 1
 
     days = statistics.median(minutes) / 60 / 24

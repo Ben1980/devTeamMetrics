@@ -1,1 +1,1 @@
-python.exe metrics.py http://arashi:8080/jira KIS "2020 P" False
+python jiraMetrics.py http://arashi:8080/jira KIS "2020 P" False

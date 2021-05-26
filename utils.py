@@ -1,9 +1,6 @@
 import statistics
 import enum
-from jira import JIRA
-from jira.resources import Issue
 from datetime import datetime
-from datetime import timedelta
 
 def GetVersion(project, versionStr, exactMatch, jira):
     if not exactMatch:
@@ -27,7 +24,6 @@ def ReleasedIn(project, version, exactMatch, jira):
 
     return versions
     
-
 def NumberOfIssuesPerReleaseIn(versions, jira):
     issuesPerPatch = []
 

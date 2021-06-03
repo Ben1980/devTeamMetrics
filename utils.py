@@ -14,7 +14,7 @@ def GetVersion(project, versionStr, exactMatch, jira):
 
     return [jira.get_project_version_by_name(project, versionStr)]
 
-def ReleasedIn(project, version, exactMatch, jira):
+def Versions(project, version, exactMatch, jira):
     projectVersions = GetVersion(project, version, exactMatch, jira)
     versions = []
 

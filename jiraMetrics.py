@@ -1,6 +1,6 @@
 import sys
 import getpass
-from utils import ReleasedIn
+from utils import Versions
 from utils import NumberOfIssuesPerReleaseIn
 from utils import MedianResolutionTimeIn
 from utils import IssueTypeDistribution
@@ -40,31 +40,31 @@ resolved = False
 if sys.argv[5].lower() in ['true', '1']:
     resolved = True
 
-released = ReleasedIn(project, version, exactMatch, jira)
+versions = Versions(project, version, exactMatch, jira)
 if not exactMatch:
-    print("Number of Versions: " + str(len(released)))
+    print("Number of Versions: " + str(len(versions)))
 
 totalIssues = 0
-issuesPerRelease = NumberOfIssuesPerReleaseIn(released, project, "", resolved, jira)
+issuesPerRelease = NumberOfIssuesPerReleaseIn(versions, project, "", resolved, jira)
 if not exactMatch:
     print("Number of Issues per Version:")
     for idx, issues in enumerate(issuesPerRelease):
         totalIssues += issues
-        print("    " + str(released[idx]) + ": " + str(issues))
+        print("    " + str(versions[idx]) + ": " + str(issues))
 else:
     totalIssues += issuesPerRelease[0]
-    print("Number of Issues " + str(released[0]) + ": " + str(issuesPerRelease[0]))
+    print("Number of Issues " + str(versions[0]) + ": " + str(issuesPerRelease[0]))
 
 if not exactMatch:
     print("Median resolution time per Version:")
-    for release in released:
+    for release in versions:
         medianResolutionTimePerPatch = MedianResolutionTimeIn(release, project, resolved, jira)
         print("    " + str(release) + ": " + medianResolutionTimePerPatch)
 else:
-    medianResolutionTime = MedianResolutionTimeIn(released[0], project, resolved, jira)
-    print("Median resolution time " + str(released[0]) + ": " + medianResolutionTime)
+    medianResolutionTime = MedianResolutionTimeIn(versions[0], project, resolved, jira)
+    print("Median resolution time " + str(versions[0]) + ": " + medianResolutionTime)
 
-issueType = IssueTypeDistribution(released, project, resolved, jira)
+issueType = IssueTypeDistribution(versions, project, resolved, jira)
 print("Issue Type Distribution:")
 print("    Bugs: " + "{:.2f}".format(100 * issueType[0]/totalIssues) + "%")
 print("    Epic: " + "{:.2f}".format(100 * issueType[1]/totalIssues) + "%")
@@ -72,10 +72,10 @@ print("    Feature: " + "{:.2f}".format(100 * issueType[2]/totalIssues) + "%")
 print("    Task: " + "{:.2f}".format(100 * issueType[3]/totalIssues) + "%")
 print("    Sub-Task: " + "{:.2f}".format(100 * issueType[4]/totalIssues) + "%")
 
-numberOfIssues = NumberOfIssuesPerReleaseIn("", project, "2020", False, jira)
-numberOfResolvedIssues = NumberOfIssuesPerReleaseIn("", project, "2020", True, jira)
-rejected = ReleasedIn(project, "Rejected", exactMatch, jira)
-numberOfRejectedIssues = NumberOfIssuesPerReleaseIn(rejected, project, "2020", False, jira)
+numberOfIssues = NumberOfIssuesPerReleaseIn("", project, "2019", False, jira)
+numberOfResolvedIssues = NumberOfIssuesPerReleaseIn("", project, "2019", True, jira)
+rejected = Versions(project, "Rejected", exactMatch, jira)
+numberOfRejectedIssues = NumberOfIssuesPerReleaseIn(rejected, project, "2019", False, jira)
 totalIssues = 0
 for issues in numberOfIssues:
     totalIssues += issues
@@ -85,5 +85,5 @@ for issues in numberOfResolvedIssues:
 totalRejectedIssues = 0
 for issues in numberOfRejectedIssues:
     totalRejectedIssues += issues
-print("Number Of Issues 2020: " + str(totalIssues) + "/" + str(totalResolvedIssues) + "/" + str(totalRejectedIssues) + " issues/resolved/rejected")
+print("Number Of Issues 2019: " + str(totalIssues) + "/" + str(totalResolvedIssues) + "/" + str(totalRejectedIssues) + " issues/resolved/rejected")
 sys.exit(0)

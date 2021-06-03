@@ -6,24 +6,25 @@ from utils import MedianResolutionTimeIn
 from utils import IssueTypeDistribution
 from jira import JIRA
 
-if len(sys.argv) < 5: # 1st arg is the metrics.py
+if len(sys.argv) < 6: # 1st arg is the metrics.py
     print("Arguments missing or in the wrong order:")
     print("    - Jira URL, e.g. https://myJiraServer.com")
     print("    - Jira Project short name, e.g. EXP")
     print("    - fixVersion, e.g. ReleaseV0.1")
-    print("    - Match version string exact, e.g. 0 = false, 1 = True")
+    print("    - Match version string exact")
+    print("    - Search only resolved issues")
     print("    Jira Credentials, Optional:")
     print("        - Jira Username")
     print("        - Jira Password")
     sys.exit(1)
 
-if len(sys.argv) > 5:
-    user = sys.argv[5]
+if len(sys.argv) > 6:
+    user = sys.argv[6]
 else:
     user = input("Jira username:")
 
-if len(sys.argv) > 6:
-    passwd = sys.argv[6]
+if len(sys.argv) > 7:
+    passwd = sys.argv[7]
 else:
     passwd = getpass.getpass("Jira password for " + user + ":")
 
@@ -35,12 +36,16 @@ exactMatch = False
 if sys.argv[4].lower() in ['true', '1']:
     exactMatch = True
 
+resolved = False
+if sys.argv[5].lower() in ['true', '1']:
+    resolved = True
+
 released = ReleasedIn(project, version, exactMatch, jira)
 if not exactMatch:
     print("Number of Versions: " + str(len(released)))
 
 totalIssues = 0
-issuesPerRelease = NumberOfIssuesPerReleaseIn(released, jira)
+issuesPerRelease = NumberOfIssuesPerReleaseIn(released, project, resolved, jira)
 if not exactMatch:
     print("Number of Issues per Version:")
     for idx, issues in enumerate(issuesPerRelease):
@@ -53,13 +58,13 @@ else:
 if not exactMatch:
     print("Median resolution time per Version:")
     for release in released:
-        medianResolutionTimePerPatch = MedianResolutionTimeIn(release, jira)
+        medianResolutionTimePerPatch = MedianResolutionTimeIn(release, project, resolved, jira)
         print("    " + str(release) + ": " + medianResolutionTimePerPatch)
 else:
-    medianResolutionTime = MedianResolutionTimeIn(released[0], jira)
+    medianResolutionTime = MedianResolutionTimeIn(released[0], project, resolved, jira)
     print("Median resolution time " + str(released[0]) + ": " + medianResolutionTime)
 
-issueType = IssueTypeDistribution(released, jira)
+issueType = IssueTypeDistribution(released, project, resolved, jira)
 print("Issue Type Distribution:")
 print("    Bugs: " + "{:.2f}".format(100 * issueType[0]/totalIssues) + "%")
 print("    Epic: " + "{:.2f}".format(100 * issueType[1]/totalIssues) + "%")

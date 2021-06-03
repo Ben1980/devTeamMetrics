@@ -24,18 +24,18 @@ def ReleasedIn(project, version, exactMatch, jira):
 
     return versions
     
-def NumberOfIssuesPerReleaseIn(versions, jira):
+def NumberOfIssuesPerReleaseIn(versions, project, resolved, jira):
     issuesPerPatch = []
 
     for version in versions:
-        query = "fixVersion=" + "'" + str(version) + "'"
+        query = Query(resolved, str(project), str(version))
         issues = jira.search_issues(query).total
         issuesPerPatch.append(issues)
 
     return issuesPerPatch
 
-def MedianResolutionTimeIn(version, jira):
-    query = "fixVersion=" + "'" + str(version) + "'"
+def MedianResolutionTimeIn(version, project, resolved, jira):
+    query = Query(resolved, str(project), str(version))
     issues = jira.search_issues(query, maxResults=1000)
     minutes = []
 
@@ -74,22 +74,44 @@ class Type(enum.Enum):
             return "Sub-task"
 
 
-def IssueTypeDistribution(versions, jira):
+def IssueTypeDistribution(versions, project, resolved, jira):
     typeValues = []
 
     for type in Type:
-        typeValues.append(AccumulateIssueType(type, versions, jira))
+        typeValues.append(AccumulateIssueType(type, versions, project, resolved, jira))
 
     return typeValues
 
-def AccumulateIssueType(type: Type, versions, jira):
+def AccumulateIssueType(type: Type, versions, project, resolved, jira):
     typeResult = 0
     for version in versions:
-        query = "fixVersion=" + "'" + str(version) + "' AND " + "issuetype=" + "'" + Type.to_string(type) + "'"
+        query = Query(resolved, str(project), str(version), Type.to_string(type))
+
         issues = jira.search_issues(query, maxResults=1000)
         for issue in issues:
             typeResult += 1
 
     return typeResult
 
+def Query(resolved, project = "", version = "", type = ""):
+    query = ""
 
+    if len(project) > 0:
+        query += "project=" + project
+
+    if len(version) > 0:
+        if len(query) > 0:
+            query += " AND "
+        query += "fixVersion=" + "'" + version + "'"
+
+    if len(type) > 0:
+        if len(query) > 0:
+            query += " AND "
+        query += "issuetype=" + "'" + type + "'"
+
+    if resolved:
+        if len(query) > 0:
+            query += " AND "
+        query += "resolution=Done"
+
+    return query

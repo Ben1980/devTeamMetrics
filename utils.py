@@ -23,16 +23,16 @@ def Versions(project, version, exactMatch, jira):
 
     return versions
     
-def NumberOfIssuesPerReleaseIn(versions, project, year, resolved, jira):
+def NumberOfIssuesPerReleaseIn(versions, project, year, resolved, yearOfIssueRes, jira):
     issuesPerPatch = []
 
     if len(versions) > 0:
         for version in versions:
-            query = Query(resolved, str(project), str(version), year=str(year))
+            query = Query(resolved, str(project), str(version), yearOfIssue=str(year), yearOfIssueRes=yearOfIssueRes)
             issues = jira.search_issues(query).total
             issuesPerPatch.append(issues)
     else:
-        query = Query(resolved, str(project), version="", year=str(year))
+        query = Query(resolved, str(project), version="", yearOfIssue=str(year), yearOfIssueRes=yearOfIssueRes)
         issues = jira.search_issues(query).total
         issuesPerPatch.append(issues)
 
@@ -97,7 +97,7 @@ def AccumulateIssueType(type: Type, versions, project, resolved, jira):
 
     return typeResult
 
-def Query(resolved, project = "", version = "", type = "", year = ""):
+def Query(resolved, project = "", version = "", type = "", yearOfIssue = "", yearOfIssueRes = False):
     query = ""
 
     if len(project) > 0:
@@ -113,10 +113,14 @@ def Query(resolved, project = "", version = "", type = "", year = ""):
             query += " AND "
         query += "issuetype=" + "'" + type + "'"
 
-    if len(year) > 0:
+    if len(yearOfIssue) > 0:
         if len(query) > 0:
             query += " AND "
-        query += "created >= " + year + "-01-01 AND created <= " + year + "-12-31"
+
+        if yearOfIssueRes:
+            query += "resolved >= " + yearOfIssue + "-01-01 AND resolved <= " + yearOfIssue + "-12-31"
+        else:
+            query += "created >= " + yearOfIssue + "-01-01 AND created <= " + yearOfIssue + "-12-31"
 
     if resolved:
         if len(query) > 0:

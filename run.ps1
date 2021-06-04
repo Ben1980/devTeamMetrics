@@ -1,1 +1,1 @@
-python jiraMetrics.py http://arashi:8080/jira KIS "2020" True True
+python jiraMetrics.py http://arashi:8080/jira KIS "2021" True True

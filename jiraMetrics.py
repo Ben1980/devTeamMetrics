@@ -45,7 +45,7 @@ if not exactMatch:
     print("Number of Versions: " + str(len(versions)))
 
 totalIssues = 0
-issuesPerRelease = NumberOfIssuesPerReleaseIn(versions, project, "", resolved, jira)
+issuesPerRelease = NumberOfIssuesPerReleaseIn(versions, project, "", resolved, False, jira)
 if not exactMatch:
     print("Number of Issues per Version:")
     for idx, issues in enumerate(issuesPerRelease):
@@ -72,10 +72,11 @@ print("    Feature: " + "{:.2f}".format(100 * issueType[2]/totalIssues) + "%")
 print("    Task: " + "{:.2f}".format(100 * issueType[3]/totalIssues) + "%")
 print("    Sub-Task: " + "{:.2f}".format(100 * issueType[4]/totalIssues) + "%")
 
-numberOfIssues = NumberOfIssuesPerReleaseIn("", project, "2019", False, jira)
-numberOfResolvedIssues = NumberOfIssuesPerReleaseIn("", project, "2019", True, jira)
+year = "2021"
+numberOfIssues = NumberOfIssuesPerReleaseIn("", project, year, False, False, jira)
+numberOfResolvedIssues = NumberOfIssuesPerReleaseIn("", project, year, True, True, jira)
 rejected = Versions(project, "Rejected", exactMatch, jira)
-numberOfRejectedIssues = NumberOfIssuesPerReleaseIn(rejected, project, "2019", False, jira)
+numberOfRejectedIssues = NumberOfIssuesPerReleaseIn(rejected, project, year, False, True, jira)
 totalIssues = 0
 for issues in numberOfIssues:
     totalIssues += issues
@@ -85,5 +86,5 @@ for issues in numberOfResolvedIssues:
 totalRejectedIssues = 0
 for issues in numberOfRejectedIssues:
     totalRejectedIssues += issues
-print("Number Of Issues 2019: " + str(totalIssues) + "/" + str(totalResolvedIssues) + "/" + str(totalRejectedIssues) + " issues/resolved/rejected")
+print("Number Of Issues " + year + ": " + str(totalIssues) + "/" + str(totalResolvedIssues) + "/" + str(totalRejectedIssues) + " issues/resolved/rejected")
 sys.exit(0)

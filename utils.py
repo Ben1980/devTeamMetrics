@@ -52,10 +52,12 @@ def MedianResolutionTimeIn(version, project, resolved, jira):
             if td_mins > 0:
                 minutes.append(td_mins)
 
-    days = statistics.median(minutes) / 60 / 24
-    hours = (days - int(days)) * 24
-    minutes = (hours - int(hours)) * 60
-    return str(int(days)) + 'd ' + str(int(hours)) + 'h ' + str(int(minutes)) + 'm'
+    if len(minutes) > 0:
+        days = statistics.median(minutes) / 60 / 24
+        hours = (days - int(days)) * 24
+        minutes = (hours - int(hours)) * 60
+        return str(int(days)) + 'd ' + str(int(hours)) + 'h ' + str(int(minutes)) + 'm'
+    return '0'
 
 class Type(enum.Enum):
     Bug = 0

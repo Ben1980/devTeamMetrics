@@ -1,9 +1,12 @@
 import sys
 import getpass
+from utils import Query
 from utils import Versions
 from utils import NumberOfIssuesPerReleaseIn
 from utils import MedianResolutionTimeIn
 from utils import IssueTypeDistribution
+from datetime import datetime
+from collections import OrderedDict
 from jira import JIRA
 
 if len(sys.argv) < 6: # 1st arg is the metrics.py
@@ -87,4 +90,25 @@ totalRejectedIssues = 0
 for issues in numberOfRejectedIssues:
     totalRejectedIssues += issues
 print("Number Of Issues " + year + ": " + str(totalIssues) + "/" + str(totalResolvedIssues) + "/" + str(totalRejectedIssues) + " issues/resolved/rejected")
+
+distribution = {}
+for version in versions:
+    query = Query(False, str(project), str(version), "")
+    issues = jira.search_issues(query, maxResults=10000)
+    for issue in issues:
+        date = datetime.fromisoformat(issue.fields.created.split("T")[0])
+        quarter = (date.month-1)//3 + 1
+        if not date.year in distribution.keys():
+            distribution[date.year] = {}
+        if not quarter in distribution[date.year]:
+            distribution[date.year][quarter] = 0
+        distribution[date.year][quarter]  += 1
+
+for key in sorted(distribution.keys()):
+    print(str(key) + ":")
+    for qar in sorted(distribution[key].keys()):
+        print(str(qar) + ":" + str(distribution[key][qar]))
+
+
+
 sys.exit(0)

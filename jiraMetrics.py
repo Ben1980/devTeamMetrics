@@ -93,7 +93,7 @@ print("Number Of Issues " + year + ": " + str(totalIssues) + "/" + str(totalReso
 
 distribution = {}
 for version in versions:
-    query = Query(False, str(project), str(version), "")
+    query = Query(False, str(project), str(version), "Bug")
     issues = jira.search_issues(query, maxResults=10000)
     for issue in issues:
         date = datetime.fromisoformat(issue.fields.created.split("T")[0])
